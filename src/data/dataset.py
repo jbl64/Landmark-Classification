@@ -1,4 +1,4 @@
-from projects.landmark_project.src.data.dataset import load_dataset
+from datasets import load_dataset
 from torch.utils.data import Dataset
 import torch
 
