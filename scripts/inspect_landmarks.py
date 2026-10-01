@@ -4,8 +4,8 @@ from src.data.dataset import load_metadata
 
 def main():
     # load the dataset
-    metadata, hf_dataset = load_metadata()
-    landmarks = sorted(set(d["landmark_id"] for d in metadata))
+    hf_dataset = load_metadata()
+    landmarks = sorted(set(hf_dataset["train"]["landmark_id"]))
 
     print(f"Num landmarks: {len(landmarks)}")
 
