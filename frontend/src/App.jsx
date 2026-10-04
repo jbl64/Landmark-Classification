@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 
 const API_URL = import.meta.env.VITE_API_URL.replace(/\/$/, '')
 
+const UNREACHABLE_MESSAGE =
+  "Couldn't reach the server. If you use an ad blocker or Brave Shields, try turning it off for this page."
+  
 function messageForStatus(status) {
   if (status === 400) return "That file doesn't look like a valid image."
   if (status === 413) return 'That image is larger than 10 MB. Try a smaller one.'
@@ -9,7 +12,7 @@ function messageForStatus(status) {
 }
 
 function App() {
-  const [serverStatus, setServerStatus] = useState('waking')
+  const [serverStatus, setServerStatus] = useState('loading')
   const [file, setFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const [classifyStatus, setClassifyStatus] = useState('ready')
@@ -55,11 +58,10 @@ function App() {
       }
       const data = await res.json()
       setPredictions(data.predictions)
+      setServerStatus('ready')
       setClassifyStatus('done')
     } catch {
-      setErrorMessage(
-        "Couldn't reach the server. If you use an ad blocker or Brave Shields, try turning it off for this page."
-      )
+      setErrorMessage(UNREACHABLE_MESSAGE)
       setClassifyStatus('error')
     }
   }
@@ -68,9 +70,9 @@ function App() {
     <main>
       <h1>Landmark Classifier</h1>
       <p>
-        {serverStatus === 'waking' && 'Waking up the server...'}
+        {serverStatus === 'loading' && 'Loading up the server...'}
         {serverStatus === 'ready' && 'Server is ready.'}
-        {serverStatus === 'error' && "Couldn't reach the server."}
+        {serverStatus === 'error' && UNREACHABLE_MESSAGE}
       </p>
       <input type="file" accept="image/*" onChange={handleFileChange} />
       {file && <p>{file.name}</p>}
@@ -83,6 +85,9 @@ function App() {
           {classifyStatus === 'loading' ? 'Classifying...' : 'Classify'}
         </button>
       </div>
+      {classifyStatus === 'loading' && serverStatus === 'waking' && (
+        <p>The server is still waking up, so this may take a moment.</p>
+      )}
       {classifyStatus === 'error' && <p>{errorMessage}</p>}
       {predictions.length > 0 && (
         <ul>
