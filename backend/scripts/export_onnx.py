@@ -6,6 +6,7 @@ Exports the fine-tuned ResNet-18 model weights to ONNX and verifies it against P
 Run it from backend/ (with best_model.pth at root (landmark_project/) downloaded from Hugging Face) with:
 "python -m scripts.export_onnx --weights ../best_model.pth"
 "python -m scripts.export_onnx --weights ../best_model.pth --check 200"
+The second one runs the pipeline check after exporting
 """
 import argparse
 import json
@@ -18,11 +19,17 @@ import torch
 from datasets import load_dataset
 from torchvision import models, transforms
 
+from urllib.parse import unquote
+
 from app.inference import LandmarkClassifier
 
 OUT_DIR = Path(__file__).resolve().parent.parent / "model"
 HF_DATASET = "pemujo/GLDv2_Top_51_Categories"
 
+# Turns a raw dataset name into a display name
+# decodes %-escapes (%C3%87 -> Ç) and swaps underscores for spaces
+def clean_name(raw: str) -> str:
+    return unquote(raw).replace("_", " ")
 
 # main() (in this file) produces train_split
 # Reproduces the class order used when the current model was trained
@@ -33,7 +40,7 @@ def build_class_names(train_split) -> list[str]:
     label_to_name = {}
     for label, name in zip(train_split["label"], train_split["category"]):
         label_to_name.setdefault(label, name)
-    return [label_to_name[label] for label in sorted(label_to_name)]
+    return [clean_name(label_to_name[label]) for label in sorted(label_to_name)]
 
 
 # Turns raw weights at weights_path into a model that can evaluate against a tensor

@@ -25,6 +25,7 @@ SIZE = 224
 # Transforms it into a numpy array the NN model in LandmarksClassifier understands
 # Helper for LandmarkClassifier's predict method
 def preprocess(img: Image.Image) -> np.ndarray:
+    img = ImageOps.exif_transpose(img)
     img = img.convert("RGB")
     img = img.resize((SIZE, SIZE), resample=Image.BILINEAR)
     arr = np.asarray(img, dtype=np.float32) / 255.0
