@@ -75,7 +75,7 @@ function App() {
         Upload a photo of a landmark and the model will guess which one it is.
       </p>
       <p className={`status ${serverStatus}`}>
-        {serverStatus === 'waking' && 'Waking up the server. The first visit can take a while...'}
+        {serverStatus === 'loading' && 'Waking up the server. The first visit can take a while...'}
         {serverStatus === 'ready' && 'Server is ready.'}
         {serverStatus === 'error' && UNREACHABLE_MESSAGE}
       </p>
