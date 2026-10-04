@@ -1,0 +1,8 @@
+# dev-side only: export and tests
+-r requirements.txt
+torch
+torchvision
+onnxscript
+datasets
+pytest
+httpx

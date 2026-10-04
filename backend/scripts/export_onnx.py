@@ -3,9 +3,9 @@ landmark_project/backend/scripts/export_onnx.py
 
 Exports the fine-tuned ResNet-18 model weights to ONNX and verifies it against PyTorch.
 
-Run it from backend/ (with best_model.pth at root (landmark_project/) downloaded from Hugging Face):
-    python -m scripts.export_onnx --weights ../best_model.pth
-    python -m scripts.export_onnx --weights ../best_model.pth --check 200
+Run it from backend/ (with best_model.pth at root (landmark_project/) downloaded from Hugging Face) with:
+"python -m scripts.export_onnx --weights ../best_model.pth"
+"python -m scripts.export_onnx --weights ../best_model.pth --check 200"
 """
 import argparse
 import json
