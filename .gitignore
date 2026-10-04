@@ -1,13 +1,18 @@
 # Python
 __pycache__/
 *.pyc
+.pytest_cache/
 
 # Virtual environments
 .venv/
 env/
 
-# Hugging Face cache
-~/.cache/
+# Environment variables / secrets
+.env
+.env.*
+
+# Frontend
+node_modules/
 
 # OS
 .DS_Store
@@ -17,3 +22,6 @@ data/metadata.pkl
 
 # best model
 best_model.pth
+
+# test image
+test.jpg
