@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+import Predictions from './Predictions.jsx'
+
 const API_URL = import.meta.env.VITE_API_URL.replace(/\/$/, '')
 
 const UNREACHABLE_MESSAGE =
@@ -39,7 +41,7 @@ function App() {
   }
 
   async function handleClassify() {
-    setClassifyStatus('Loading')
+    setClassifyStatus('loading')
     setPredictions([])
     setErrorMessage('')
 
@@ -67,37 +69,43 @@ function App() {
   }
 
   return (
-    <main>
+    <main className="app">
       <h1>Landmark Classifier</h1>
-      <p>
-        {serverStatus === 'loading' && 'Loading up the server...'}
+      <p className="subtitle">
+        Upload a photo of a landmark and the model will guess which one it is.
+      </p>
+      <p className={`status ${serverStatus}`}>
+        {serverStatus === 'waking' && 'Waking up the server. The first visit can take a while...'}
         {serverStatus === 'ready' && 'Server is ready.'}
         {serverStatus === 'error' && UNREACHABLE_MESSAGE}
       </p>
-      <input type="file" accept="image/*" onChange={handleFileChange} />
-      {file && <p>{file.name}</p>}
-      {previewUrl && <img src={previewUrl} alt="Selected photo" width="300" />}
-      <div>
+
+      <section className="card">
+        <label className="file-button">
+          <input type="file" accept="image/*" onChange={handleFileChange} hidden />
+          {file ? 'Choose a different photo' : 'Choose a photo'}
+        </label>
+        {file && <p className="filename">{file.name}</p>}
+        {previewUrl && <img className="preview" src={previewUrl} alt="Selected photo" />}
         <button
+          className="primary"
           onClick={handleClassify}
           disabled={!file || classifyStatus === 'loading'}
         >
           {classifyStatus === 'loading' ? 'Classifying...' : 'Classify'}
         </button>
-      </div>
-      {classifyStatus === 'loading' && serverStatus === 'waking' && (
-        <p>The server is still waking up, so this may take a moment.</p>
-      )}
-      {classifyStatus === 'error' && <p>{errorMessage}</p>}
-      {predictions.length > 0 && (
-        <ul>
-          {predictions.map((p) => (
-            <li key={p.label}>
-              {p.label}: {(p.confidence * 100).toFixed(1)}%
-            </li>
-          ))}
-        </ul>
-      )}
+        {classifyStatus === 'loading' && (
+          <p className="note" role="status">
+            <span className="spinner" aria-hidden="true" /> Analyzing your photo...
+          </p>
+        )}
+        {classifyStatus === 'loading' && serverStatus === 'waking' && (
+          <p className="note">The server is still waking up, so this may take a moment.</p>
+        )}
+      </section>
+
+      {classifyStatus === 'error' && <p className="error">{errorMessage}</p>}
+      {predictions.length > 0 && <Predictions predictions={predictions} />}
     </main>
   )
 }
