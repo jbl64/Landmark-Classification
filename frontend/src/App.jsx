@@ -5,8 +5,11 @@ import Predictions from './Predictions.jsx'
 const API_URL = import.meta.env.VITE_API_URL.replace(/\/$/, '')
 
 const UNREACHABLE_MESSAGE =
-  "Couldn't reach the server. If you use an ad blocker or Brave Shields, try turning it off for this page."
-  
+  "Couldn't reach the server. If you use an ad blocker, try turning it off for this page."
+
+// Maps the backend's error codes to messages for the user.
+// 400 = invalid image, 413 = over the 10 MB limit.
+// (see backend/README.md for more)
 function messageForStatus(status) {
   if (status === 400) return "That file doesn't look like a valid image."
   if (status === 413) return 'That image is larger than 10 MB. Try a smaller one.'
@@ -14,13 +17,20 @@ function messageForStatus(status) {
 }
 
 function App() {
+  // We track two separate statuses because they can overlap
+  // serverStatus: the status of the server waking up
+  // loading | ready | error
   const [serverStatus, setServerStatus] = useState('loading')
   const [file, setFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
+  // classifyStatus: the status of the current classification request
+  // ready | loading | done | error
   const [classifyStatus, setClassifyStatus] = useState('ready')
   const [predictions, setPredictions] = useState([])
   const [errorMessage, setErrorMessage] = useState('')
 
+  // Runs once on page load. Calling /health starts waking the sleeping server
+  // before the user has picked a photo.
   useEffect(() => {
     fetch(`${API_URL}/health`)
       .then((res) => {
@@ -32,6 +42,7 @@ function App() {
   function handleFileChange(event) {
     const chosen = event.target.files[0]
     if (!chosen) return
+    // We free the old preview from the browser's memory before making a new one
     if (previewUrl) URL.revokeObjectURL(previewUrl)
     setFile(chosen)
     setPreviewUrl(URL.createObjectURL(chosen))
@@ -45,6 +56,9 @@ function App() {
     setPredictions([])
     setErrorMessage('')
 
+    // Don't set a Content-Type header on this request. The browser sets it
+    // itself, including a boundary string that only the browser knows, and
+    // setting it by hand breaks the upload.
     const formData = new FormData()
     formData.append('file', file)
 
@@ -60,9 +74,13 @@ function App() {
       }
       const data = await res.json()
       setPredictions(data.predictions)
+      // A successful prediction means that the server is up, even if /health
+      // hasn't answered yet
       setServerStatus('ready')
       setClassifyStatus('done')
     } catch {
+      // The request never completed: the server is unreachable,
+      // blocked by CORS, an ad blocker, or Brave Shields
       setErrorMessage(UNREACHABLE_MESSAGE)
       setClassifyStatus('error')
     }
@@ -99,7 +117,7 @@ function App() {
             <span className="spinner" aria-hidden="true" /> Analyzing your photo...
           </p>
         )}
-        {classifyStatus === 'loading' && serverStatus === 'waking' && (
+        {classifyStatus === 'loading' && serverStatus === 'loading' && (
           <p className="note">The server is still waking up, so this may take a moment.</p>
         )}
       </section>
