@@ -1,42 +1,45 @@
-# Landmark Classification with Transfer Learning
+# Landmark Classifier
 
-Classifies photos into 51 famous landmark categories using a fine-tuned ResNet-18. Achieves **95.2% validation accuracy** on the [GLDv2 Top 51 dataset](https://huggingface.co/datasets/pemujo/GLDv2_Top_51_Categories).
+Upload a photo of a landmark and the model guesses which of 51 famous landmarks it is.
 
-Built as a first step toward an AI agent that can play [TimeGuessr](https://timeguessr.com).
+- [LIVE DEMO](https://landmark-classification.vercel.app)
+- [Dataset](https://huggingface.co/datasets/pemujo/GLDv2_Top_51_Categories)
+- [Model weights](https://huggingface.co/jblee64/landmark-classification-resnet18)
 
----
+NOTE: The backend runs on Render, which sleeps when idle, so the first visit can take a while to load.
 
-## Quickstart
+## How it works
 
-```bash
-pip install -r requirements.txt
-python -m src.main
-```
+The page is a React app served by Vercel. When you upload a photo, your browser sends it to a FastAPI service on Render, which runs the model and returns the top three guesses with confidence scores.
 
-## Inference
+The model is a ResNet-18, pretrained on ImageNet and fine-tuned in PyTorch on 51 landmark classes. For serving, it is exported to ONNX and checked against the PyTorch version, so the server runs without PyTorch.
 
-Download weights and run predictions on a single image:
+See [`backend/README.md`](backend/README.md) and [`frontend/README.md`](frontend/README.md) for details.
 
-```python
-from huggingface_hub import hf_hub_download
-hf_hub_download(repo_id="jblee64/landmark-classification-resnet18", filename="best_model.pth", local_dir=".")
-```
+## Results
 
-```bash
-python inference.py path/to/image.jpg
-```
+95.2% validation accuracy on the 51-class [GLDv2 subset](https://huggingface.co/datasets/pemujo/GLDv2_Top_51_Categories), about 36k images.
 
-Prints top 5 predicted landmarks with confidence scores.
+## Tech stack
 
----
+PyTorch, ONNX Runtime, FastAPI, React, Vite, Render, Vercel.
 
-## Model
+## Running it locally
 
-- ResNet-18 pretrained on ImageNet, `layer4` fine-tuned
-- StepLR scheduler (step=3, gamma=0.1)
-- Trained weights: [jblee64/landmark-classification-resnet18](https://huggingface.co/jblee64/landmark-classification-resnet18)
+The backend and frontend each have their own setup. See [`backend/README.md`](backend/README.md) and [`frontend/README.md`](frontend/README.md).
 
-## Notes
+The training code is in `src/` (`python -m src.main`). The original command-line script for the PyTorch weights is `inference.py` in the repo root.
 
-- Runs on CPU, CUDA, or Apple MPS
-- Dataset cached locally via HuggingFace
+## Limitations
+
+- The first request after a period of inactivity can take a while, since the free server has to wake up and load the model.
+- The model only knows 51 landmarks. Its confidence is relative to those 51, so a photo of anything else still gets confident-looking labels. 
+- The public demo has no authentication.
+
+## What's next
+
+(in no particular order)
+- Reworking the training pipeline
+- Expanding the dataset to cover more landmarks
+
+This is the first stage of a project to build an agent that can play [TimeGuessr](https://timeguessr.com).
