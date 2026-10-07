@@ -86,7 +86,7 @@ Errors:
 | 413 | The file is larger than 10 MB |
 | 422 | No `file` field in the request (FastAPI's own validation) |
 
-Any image format Pillow can decode works. Before classification, the image gets its EXIF rotation applied, is converted to RGB, is squashed to 224 x 224 with no cropping, and is normalized with the ImageNet mean and standard deviation. These must match `src/data/transforms.py` in the repo root.
+Any image format Pillow can decode works. Before classification, the image gets its EXIF rotation applied, is converted to RGB, is squashed to 224 x 224 with no cropping, and is normalized with the ImageNet mean and standard deviation. These must match `src/landmarks/data/transforms.py` in the repo root.
 
 Confidence is how the model splits its probability across the 51 known landmarks. It is not a measure of whether the photo shows one of them, so an unrelated photo still gets confident-looking labels.
 

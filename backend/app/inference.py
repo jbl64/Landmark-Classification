@@ -13,7 +13,7 @@ from PIL import Image, ImageOps
 
 
 # The valeus below must match their corresponding values from transforms.py
-# (landmark_project/src/data/transforms.py)
+# (landmark_project/src/landmarks/data/transforms.py)
 # The transformation is a squash with no image cropping
 # Helper for LandmarkClassifier's predict method
 MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
