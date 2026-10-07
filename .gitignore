@@ -25,3 +25,6 @@ best_model.pth
 
 # test image
 test.jpg
+src/*.egg-info/
+datasets/
+runs/

@@ -2,10 +2,10 @@ import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from src.models.landmark_model import build_model
-from src.data.transforms import get_transforms
-from src.data.dataset import LandmarkDataset, load_metadata
-from src.training.train import run_model
+from landmarks.models.landmark_model import build_model
+from landmarks.data.transforms import get_transforms
+from landmarks.data.dataset import LandmarkDataset, load_metadata
+from landmarks.training.train import run_model
 
 
 def get_device():

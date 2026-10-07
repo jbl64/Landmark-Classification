@@ -1,5 +1,5 @@
 from datasets import load_dataset
-from src.data.dataset import load_metadata
+from landmarks.data.dataset import load_metadata
 
 
 def main():

@@ -1,7 +1,7 @@
 import torch
 from PIL import Image
-from src.models.landmark_model import build_model
-from src.data.transforms import get_transforms
+from landmarks.models.landmark_model import build_model
+from landmarks.data.transforms import get_transforms
 from datasets import load_dataset
 
 def load_label_map():
